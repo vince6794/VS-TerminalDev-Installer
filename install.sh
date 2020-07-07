@@ -12,7 +12,7 @@ cp -r alacritty "$HOME"/.config
 sudo apt install curl --assume-yes
 
 # Installing nodejs (for programs such as prettier)
-#sudo apt install nodejs npm --assume-yes
+sudo apt install nodejs npm --assume-yes
 
 # Installing oh-my-zsh
 sudo apt install zsh --assume-yes
