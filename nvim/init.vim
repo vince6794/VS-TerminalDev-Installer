@@ -12,75 +12,34 @@
 "                           /_______  /|__|__|_|  /\___  >____/|___|  /\___  >
 "                                   \/          \/     \/           \/     \/
 "
-"
-""
+  "
+  ""
 
-" Plugin Manager {{{
+
 call plug#begin("~/.vim/plugged")
-""Plugin Section
-" Code intellisense
- Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-" Prettify code
-"Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
- Plug 'sbdchd/neoformat'
+ Plug 'neoclide/coc.nvim', {'branch': 'release'}
  Plug 'jiangmiao/auto-pairs'
 
-" cTags support
- "Plug 'ludovicchabant/vim-gutentags'
-
-" Git Support
- Plug 'tpope/vim-fugitive'
-
-""Utils
- Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
- Plug 'junegunn/fzf.vim'
- Plug 'norcalli/nvim-colorizer.lua'
+ Plug 'preservim/nerdtree'
+ Plug 'zefei/vim-wintabs'
+ Plug 'zefei/vim-wintabs-powerline'
  Plug 'mbbill/undotree'
  Plug 'mhinz/vim-startify'
 
-""Language Support
- Plug 'sheerun/vim-polyglot'
-
-" Styles
  Plug 'gruvbox-community/gruvbox'
  Plug 'sainnhe/gruvbox-material'
- Plug 'phanviet/vim-monokai-pro'
  Plug 'vim-airline/vim-airline'
  Plug 'vim-airline/vim-airline-themes'
  Plug 'frazrepo/vim-rainbow'
+ Plug 'norcalli/nvim-colorizer.lua'
  Plug 'ryanoasis/vim-devicons'
 
 call plug#end()
 
-""Plugin Configurations
 
-"}}}
+let mapleader = " "
 
-" Theme {{{
-if has('termguicolors')
-  set termguicolors
-endif
-
-let g:rainbow_active = 1
-
-lua require'colorizer'.setup()
-let g:airline_theme = 'gruvbox_material'
-
-" For dark version.
-set background=dark
-
-let g:gruvbox_material_background = 'soft'
-colorscheme gruvbox-material
-" }}}
-
-" Formatting {{{
- let g:neoformat_try_formatprg = 1
-" }}}
-
-" Symbols Management {{{
-
-" coc extensions
 let g:coc_global_extensions = [
       \ 'coc-tslint-plugin',
       \ 'coc-tsserver',
@@ -89,9 +48,19 @@ let g:coc_global_extensions = [
       \ 'coc-html',
       \ 'coc-json',
       \ 'coc-snippets',
-      \]
+      \ 'coc-python',
+      \ 'coc-java']
 
+set termguicolors
+let g:rainbow_active = 1
+lua require'colorizer'.setup()
 
+set background=dark
+let g:airline_theme = 'gruvbox_material'
+let g:airline_powerline_fonts = 1
+map <C-W>o <Plug>(wintabs_only_window)
+let g:gruvbox_material_background = 'soft'
+colorscheme gruvbox-material
 
 " TextEdit might fail if hidden is not set.
 set hidden
@@ -144,6 +113,7 @@ if exists('*complete_info')
 else
   inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 endif
+  inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
@@ -171,7 +141,7 @@ endfunction
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Symbol renaming.
-nmap <leader>rn <Plug>(coc-rename)
+nmap <leader>r <Plug>(coc-rename)
 
 " Formatting selected code.
 xmap <leader>f  <Plug>(coc-format-selected)
@@ -185,15 +155,8 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-" Applying codeAction to the selected region.
-" Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
-
 " Remap keys for applying codeAction to the current buffer.
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Apply AutoFix to problem on the current line.
-nmap <leader>qf  <Plug>(coc-fix-current)
+nmap <leader>a :<C-u>CocAction<cr>
 
 " Map function and class text objects
 " NOTE: Requires 'textDocument.documentSymbol' support from the language server.
@@ -206,77 +169,37 @@ omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 
-" Use CTRL-S for selections ranges.
-" Requires 'textDocument/selectionRange' support of LS, ex: coc-tsserver
-nmap <silent> <C-s> <Plug>(coc-range-select)
-xmap <silent> <C-s> <Plug>(coc-range-select)
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-arg>)
+
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
 " Add (Neo)Vim's native statusline support.
-" NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-let g:airline#extensions#coc#enabled = 1
-let g:airline#extensions#tabline#enabled = 1
 
 " Mappings for CoCList
 " Show all diagnostics.
-noremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent><nowait> <space>E  :<C-u>CocList diagnostics<cr>
+" Show commands.
+nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document.
+nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols.
+nnoremap <silent><nowait> <space>S  :<C-u>CocList -I symbols<cr>
 
-"}}}
-
-" Language specific configuration {{{
-
-  "NodeJS {{{
-  "Ignoring node_modules
-  let $FZF_DEFAULT_COMMAND = 'ag -g ""'
-  set wildignore+=**/node_modules/**
-"}}}
-
-"}}}
-
-" File browsing {{{
-"" FILE BROWSING:
-" Finding Files
-" Search down into subfolders
-" Provides tab-completion fo all file-related tasks
-set path+=**
-
-" Tweaks for browsing
-let g:netrw_altv=1
-let g:netrw_banner=0        " disable annoying banner
-let g:netrw_browse_split=4  " open in prior window
-let g:netrw_altv=1          " open splits to the right
-let g:netrw_liststyle=3     " tree view
-let g:netrw_list_hide=netrw_gitignore#Hide()
-let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
-let g:netrw_winsize=30
-let g:NetrwIsOpen=0
-
-function! ToggleNetrw()
-    if g:NetrwIsOpen
-        let i = bufnr("$")
-        while (i >= 1)
-            if (getbufvar(i, "&filetype") == "netrw")
-                silent exe "bwipeout " . i
-            endif
-            let i-=1
-        endwhile
-        let g:NetrwIsOpen=0
-    else
-        let g:NetrwIsOpen=1
-        silent Lexplore
-    endif
-endfunction
-
-noremap <silent> <C-e> :call ToggleNetrw()<CR>
-"}}}
-
-"Custom mapping {{{
-"Set leader
-let mapleader = " "
 " Error switching
 nnoremap <leader>Ep <Plug>(coc-diagnostic-prev)
 nnoremap <leader>En <Plug>(coc-diagnostic-next)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+let $FZF_DEFAULT_COMMAND = 'ag -g ""'
+set wildignore+=**/node_modules/**
+
 
 " Switching Between panels
 " use alt+hjkl to move between split/vsplit panels
@@ -288,37 +211,24 @@ nnoremap <A-h> <C-w>h
 nnoremap <A-j> <C-w>j
 nnoremap <A-k> <C-w>k
 nnoremap <A-l> <C-w>l
+
+" WinTabs
+map <C-n> <Plug>(wintabs_previous)
+map <C-p> <Plug>(wintabs_next)
+map <C-N> gt
+map <C-P> gT
+map <C-T>x <Plug>(wintabs_close)
+map <C-T>u <Plug>(wintabs_undo)
+
 nnoremap <leader>u :UndotreeToggle<CR>
-
-"Custom Mapping
-"Insert newLine without enter in INSERT mode
-"nnoremap o o<Esc>
-"nnoremap O O<Esc>
-
-nnoremap <C-p> :GFiles<CR>
-nnoremap <Leader>pf :Files<CR>
 
 "List buffers
 nnoremap <leader>b :ls<cr>:b
 
-"}}}
+"Explorer
+"autocmd vimenter * NERDTree
+map <C-e> :NERDTreeToggle<CR>
 
-"Autocmd {{{
-"augroup remember_folds
-"  autocmd!
-"  autocmd BufWinLeave ?* mkview
-"  autocmd BufWinEnter ?* silent! loadview
-"augroup END
-"set viewoptions-=options
-
-" Formatting
-augroup fmt
-  autocmd!
-  autocmd BufWritePre * undojoin | Neoformat
-augroup END
-"}}}
-
-"Native Configuration {{{
 set nocompatible
 syntax on
 filetype plugin on
@@ -340,7 +250,7 @@ set incsearch
 set hidden
 "set foldmethod=syntax
 set colorcolumn=80
-"highlight ColorColumn ctermbg=0 guibg=lightgrey
+set mouse=a
 
 if executable('rg')
     let g:rg_derive_root='true'
@@ -357,4 +267,3 @@ autocmd BufWritePre * :call TrimWhitespace()
 
 "Display all matching files when we tab complete
 set wildmenu
-"}}}
